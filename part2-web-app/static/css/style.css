@@ -1,0 +1,307 @@
+/* ---------------------------------------------------------------------------
+   Design tokens
+   Subject: a login/identity flow. Two distinct "brands" appear on screen --
+   Aegis ID (the Identity Provider) and Lighthouse Notes (the Relying Party)
+   -- so the palette gives each a distinguishing accent, on a shared neutral
+   base. Monospace is used functionally, for keys/tokens/log output, not as
+   decoration.
+--------------------------------------------------------------------------- */
+:root {
+  --paper: #F2F4F3;
+  --panel: #FFFFFF;
+  --ink: #16211F;
+  --muted: #51625E;
+  --line: #C9D2CE;
+
+  --idp-accent: #6B4F9E;    /* Aegis ID (Identity Provider) */
+  --idp-accent-dim: #EDE7F5;
+  --app-accent: #2E6F63;    /* Lighthouse Notes (Relying Party) */
+  --app-accent-dim: #E3EEEC;
+
+  --key-amber: #B8862B;
+  --success: #3F8F5F;
+  --alert: #A23E3E;
+  --alert-dim: #F6E9E9;
+
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.5em 0;
+}
+
+a { color: var(--app-accent); }
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 32px;
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 18px;
+}
+
+.brand .mark {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: white;
+}
+
+.brand.idp .mark { background: var(--idp-accent); }
+.brand.app .mark { background: var(--app-accent); }
+
+.top-bar .tag {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+main {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 48px 32px 80px 32px;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+@media (max-width: 860px) {
+  .split { grid-template-columns: 1fr; }
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 32px;
+}
+
+.lede {
+  color: var(--muted);
+  max-width: 60ch;
+}
+
+.field {
+  margin-bottom: 18px;
+}
+
+.field label {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.field input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  background: var(--paper);
+}
+
+.field input:focus {
+  outline: 2px solid var(--idp-accent);
+  outline-offset: 1px;
+}
+
+button, .button {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 15px;
+  padding: 11px 20px;
+  border-radius: 3px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  color: white;
+}
+
+button:focus-visible, .button:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.button.idp, button.idp { background: var(--idp-accent); }
+.button.app, button.app { background: var(--app-accent); }
+
+.hint {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 16px;
+}
+
+.demo-users {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 12px 14px;
+  margin-top: 16px;
+}
+
+.error-box {
+  background: var(--alert-dim);
+  border: 1px solid var(--alert);
+  color: var(--alert);
+  padding: 12px 14px;
+  border-radius: 3px;
+  font-size: 14px;
+  margin-bottom: 18px;
+}
+
+/* ---- Live process trace panel ---- */
+
+.trace-panel {
+  background: var(--ink);
+  color: #D7E4E0;
+  border-radius: 4px;
+  padding: 24px;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+}
+
+.trace-panel h3 {
+  color: white;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  text-transform: none;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #2C3B37;
+  padding-bottom: 10px;
+}
+
+.trace-line {
+  display: flex;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid #202E2A;
+  opacity: 0;
+  animation: trace-in 0.35s ease forwards;
+}
+
+.trace-line:last-child { border-bottom: none; }
+
+.trace-line .icon { flex: none; }
+
+.trace-line .actor {
+  flex: none;
+  width: 62px;
+  color: #7E938D;
+  text-transform: lowercase;
+}
+
+.trace-line.actor-idp .actor { color: #C7B4E8; }
+.trace-line.actor-app .actor { color: #9FCFC1; }
+.trace-line.actor-browser .actor { color: #E0C98A; }
+
+@keyframes trace-in {
+  from { opacity: 0; transform: translateY(3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.claims-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.claims-table td {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+  vertical-align: top;
+}
+
+.claims-table td:first-child {
+  color: var(--muted);
+  width: 110px;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+
+.token-block {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 14px;
+  word-break: break-all;
+  line-height: 1.7;
+}
+
+.token-block .seg-header { color: var(--idp-accent); }
+.token-block .seg-payload { color: var(--app-accent); }
+.token-block .seg-sig { color: var(--key-amber); }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--success);
+  background: #E7F2EC;
+  border: 1px solid var(--success);
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+
+.section-label {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin: 28px 0 8px 0;
+}
+
+.callout {
+  border-left: 3px solid var(--key-amber);
+  background: #FBF4E7;
+  padding: 14px 16px;
+  font-size: 14px;
+  color: var(--ink);
+  margin-top: 24px;
+}
+
+footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  padding: 40px 0 10px 0;
+}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Sign in — Aegis ID{% endblock %}
+{% block tag %}Identity Provider{% endblock %}
+
+{% block content %}
+{% set brand_kind = 'idp' %}
+<div class="split">
+  <div class="panel">
+    <h2>Sign in to Aegis ID</h2>
+    <p class="lede">
+      Lighthouse Notes asked Aegis ID to authenticate you. Your password is
+      entered here, on the Identity Provider — Lighthouse Notes never sees it.
+    </p>
+
+    {% if error %}
+      <div class="error-box">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="/authorize/login">
+      <input type="hidden" name="client_id" value="{{ client_id }}">
+      <input type="hidden" name="redirect_uri" value="{{ redirect_uri }}">
+      <input type="hidden" name="state" value="{{ state }}">
+      <input type="hidden" name="trace_b64" value="{{ trace_b64 }}">
+
+      <div class="field">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" autocomplete="username" autofocus>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" autocomplete="current-password">
+      </div>
+
+      <button type="submit" class="idp">Sign in</button>
+    </form>
+
+    <div class="demo-users">
+      Try: alice / correct-horse-battery-staple<br>
+      or: bob / hunter2-but-better
+    </div>
+  </div>
+
+  <div class="trace-panel">
+    <h3>Live process trace</h3>
+    <div id="trace-container" data-trace='{{ trace|tojson }}'></div>
+  </div>
+</div>
+{% endblock %}

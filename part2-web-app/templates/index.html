@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Lighthouse Notes{% endblock %}
+{% block tag %}Relying Party{% endblock %}
+
+{% block content %}
+{% set brand_kind = 'app' %}
+{% set brand_mark = 'L' %}
+<div class="split">
+  <div class="panel">
+    <h1>Lighthouse Notes</h1>
+    <p class="lede">
+      A small demo app that doesn't handle its own logins. Instead, it trusts
+      Aegis ID — a separate Identity Provider — to authenticate you, and only
+      ever receives a signed statement of who you are.
+    </p>
+    <a href="/login" class="button idp">Continue with Aegis ID</a>
+    <p class="hint">
+      This mirrors exactly what happens when an app offers "Sign in with
+      Okta," "Sign in with Google," or similar: the app you're using never
+      sees your password, and never needs to.
+    </p>
+  </div>
+
+  <div class="panel">
+    <h3>What you're about to see</h3>
+    <p class="lede">
+      Clicking through will redirect you to Aegis ID to log in, then back here.
+      Along the way, a live trace panel will narrate each step — including
+      exactly which cryptographic operation is happening and why it matters.
+      Nothing here is production software; see the repository's README for
+      what's simplified and why.
+    </p>
+  </div>
+</div>
+{% endblock %}

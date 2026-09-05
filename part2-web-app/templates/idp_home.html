@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Aegis ID — Identity Provider{% endblock %}
+{% block tag %}Identity Provider{% endblock %}
+
+{% block content %}
+{% set brand_kind = 'idp' %}
+<h1>Aegis ID</h1>
+<p class="lede">
+  This is the toy Identity Provider from <code>auth-from-scratch</code>. It plays
+  the role Okta, Auth0, or any OIDC-compliant provider plays in a real system:
+  it holds user credentials, authenticates users, and issues signed identity
+  tokens to apps it trusts — without ever handing those apps a password.
+</p>
+
+<div class="demo-users">
+  Demo accounts:<br>
+  alice / correct-horse-battery-staple<br>
+  bob / hunter2-but-better
+</div>
+
+<p class="hint">
+  You normally shouldn't need to visit this page directly — start instead at
+  <a href="http://localhost:5002/">Lighthouse Notes</a> and click "Continue
+  with Aegis ID." This page exists mainly so a direct visit isn't a dead end.
+</p>
+{% endblock %}

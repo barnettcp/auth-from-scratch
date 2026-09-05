@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Welcome — Lighthouse Notes{% endblock %}
+{% block tag %}Relying Party{% endblock %}
+
+{% block content %}
+{% set brand_kind = 'app' %}
+{% set parts = raw_token.split('.') %}
+
+<div class="split">
+  <div class="panel">
+    <span class="badge">✓ Signature verified</span>
+    <h2>Welcome, {{ claims.name }}</h2>
+    <p class="lede">
+      Lighthouse Notes never saw your password. It received the signed token
+      below from Aegis ID, verified it independently using Aegis ID's public
+      key, and only then considered you logged in.
+    </p>
+
+    <div class="section-label">Decoded claims (the payload, human-readable)</div>
+    <table class="claims-table">
+      <tr><td>sub</td><td>{{ claims.sub }}</td></tr>
+      <tr><td>name</td><td>{{ claims.name }}</td></tr>
+      <tr><td>email</td><td>{{ claims.email }}</td></tr>
+      <tr><td>iss</td><td>{{ claims.iss }}</td></tr>
+      <tr><td>iat</td><td>{{ claims.iat }}</td></tr>
+      <tr><td>exp</td><td>{{ claims.exp }}</td></tr>
+    </table>
+
+    <div class="section-label">Raw token (header.payload.signature)</div>
+    <div class="token-block">
+      <span class="seg-header">{{ parts[0] }}</span>.<span class="seg-payload">{{ parts[1] }}</span>.<span class="seg-sig">{{ parts[2] }}</span>
+    </div>
+
+    <div class="callout">
+      Note that the header and payload above are <strong>readable by anyone</strong> —
+      they're base64-encoded, not encrypted. Try pasting the first two segments
+      into any base64url decoder. What makes this token trustworthy is entirely
+      the third segment: a signature that could only have been produced by
+      Aegis ID's private key, over this exact header and payload. See
+      <code>part1-foundations/05_building_a_jwt_by_hand.ipynb</code> for a
+      step-by-step walkthrough of exactly this structure.
+    </div>
+
+    <p class="hint"><a href="/">← Start over</a></p>
+  </div>
+
+  <div class="trace-panel">
+    <h3>Full process trace</h3>
+    <div id="trace-container" data-trace='{{ trace|tojson }}'></div>
+  </div>
+</div>
+{% endblock %}

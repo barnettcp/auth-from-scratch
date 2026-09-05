@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Login rejected — Lighthouse Notes{% endblock %}
+{% block tag %}Relying Party{% endblock %}
+
+{% block content %}
+{% set brand_kind = 'app' %}
+<div class="split">
+  <div class="panel">
+    <h2>This login attempt was rejected</h2>
+    <div class="error-box">{{ message }}</div>
+    <p class="lede">
+      This is what a correctly-implemented Relying Party is supposed to do
+      when something doesn't check out — reject the login rather than guess.
+      See <code>part1-foundations/06_verifying_and_forging_jwts.ipynb</code>
+      for the underlying idea and a hands-on demonstration of exactly this
+      kind of rejection.
+    </p>
+    <a href="/" class="button app">Start over</a>
+  </div>
+
+  <div class="trace-panel">
+    <h3>Live process trace</h3>
+    <div id="trace-container" data-trace='{{ trace|tojson }}'></div>
+  </div>
+</div>
+{% endblock %}
