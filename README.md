@@ -32,9 +32,10 @@ public/private key pair turns into "you can trust this login."
 
 ```
 auth-from-scratch/
-├── part1-foundations/       7 Jupyter notebooks, in order, building up
+├── part1-foundations/       8 Jupyter notebooks, in order, building up
 │                            from symmetric encryption to a full simulated
-│                            SSO login flow
+│                            SSO login flow and then the identity-vs-tool-access
+│                            boundary
 ├── part2-web-app/           Two small Flask servers -- a toy Identity
 │                            Provider ("Aegis ID") and a toy Relying Party
 │                            ("Lighthouse Notes") -- doing a real, simplified
@@ -58,6 +59,7 @@ Work through these in order; each one builds on the last.
 | `05_building_a_jwt_by_hand.ipynb` | Constructing a JWT byte-by-byte, no libraries |
 | `06_verifying_and_forging_jwts.ipynb` | Verifying a token correctly, then trying (and failing) to forge one |
 | `07_simulated_oidc_dance.ipynb` | The full login choreography, in plain Python objects — Identity Provider, Relying Party, and the browser in between |
+| `08_tool_access_and_policy.ipynb` | The conceptual boundary between authenticated identity and allowed tool access — who you are vs what you can do |
 
 Run them with Jupyter:
 
