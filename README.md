@@ -8,7 +8,11 @@ primitives up, in Python, with a runnable toy web app at the end.
 This repository doesn't teach you how to configure Okta or Auth0. It teaches
 you what those services are doing for you, so that configuring them (or
 reasoning about whether they're secure) stops feeling like trusting a black
-box. 
+box.
+
+The repo is structured as a teaching progression: first prove identity, then
+show how that identity becomes authorizable actions, including tool access and
+policy enforcement.
 
 This was built as a personal project so I could learn a bit about what
 is happening behind the scenes with SSO, and to see it in code. After initial 
@@ -31,11 +35,14 @@ auth-from-scratch/
 ├── part1-foundations/       7 Jupyter notebooks, in order, building up
 │                            from symmetric encryption to a full simulated
 │                            SSO login flow
-└── part2-web-app/           Two small Flask servers -- a toy Identity
-                             Provider ("Aegis ID") and a toy Relying Party
-                             ("Lighthouse Notes") -- doing a real, simplified
-                             OIDC-style login over actual HTTP, with a live
-                             on-page trace of every step
+├── part2-web-app/           Two small Flask servers -- a toy Identity
+│                            Provider ("Aegis ID") and a toy Relying Party
+│                            ("Lighthouse Notes") -- doing a real, simplified
+│                            OIDC-style login over actual HTTP, with a live
+│                            on-page trace of every step
+└── part3-tool-access/        Illustrative, non-production examples of
+                             user identity plus tool authorization and policy
+                             enforcement after login
 ```
 
 ### Part 1 — Foundations (start here)
@@ -66,6 +73,17 @@ watch it happen in a browser, with a live process trace narrating each step
 as it occurs.
 
 See [`part2-web-app/README.md`](part2-web-app/README.md) for instructions.
+
+### Part 3 — Tool access and authorization
+
+Once identity is established, the next question is whether a user is allowed to
+invoke a given tool or action. This part introduces the conceptual split between
+authentication and authorization, using toy examples that are intentionally
+simple but map closely onto real tool gateways, internal APIs, and agentic
+access control.
+
+See [`part3-tool-access/README.md`](part3-tool-access/README.md) for the
+introductory concept and the recommended framing for this section.
 
 ## How this maps onto Okta / Auth0 / real SSO
 
