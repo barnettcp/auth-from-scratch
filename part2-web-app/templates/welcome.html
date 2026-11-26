@@ -41,6 +41,41 @@
       step-by-step walkthrough of exactly this structure.
     </div>
 
+    <div class="section-label">Authorization after login</div>
+    <p class="lede">
+      The identity check succeeded. The app now checks whether this specific
+      user is allowed to use a given tool on a given resource. This is the
+      important distinction between <strong>authentication</strong> and
+      <strong>authorization</strong>.
+    </p>
+
+    <table class="claims-table tool-table">
+      <tr>
+        <th>Tool</th>
+        <th>Resource</th>
+        <th>Decision</th>
+        <th>Why</th>
+        <th>Action</th>
+      </tr>
+      {% for check in policy_checks %}
+      <tr>
+        <td>{{ check.tool }}</td>
+        <td>{{ check.resource }}</td>
+        <td class="decision {{ 'allowed' if check.allowed else 'denied' }}">
+          {{ 'ALLOWED' if check.allowed else 'DENIED' }}
+        </td>
+        <td>{{ check.reason }}</td>
+        <td>
+          {% if check.allowed %}
+            <a class="button app tiny" href="{{ url_for('invoke_tool', tool=check.tool, resource=check.resource) }}">Try it</a>
+          {% else %}
+            <span class="tiny muted">Blocked</span>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+
     <p class="hint"><a href="/">← Start over</a></p>
   </div>
 

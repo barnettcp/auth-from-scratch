@@ -46,12 +46,64 @@ OUR_REDIRECT_URI = "http://localhost:5002/callback"
 OUR_CLIENT_ID = "lighthouse-notes-demo"
 TRUSTED_ISSUER = IDP_BASE_URL
 
+# A toy policy table: same user can authenticate as themselves, but only some
+# users are allowed to call certain tools on certain resources.
+# This mirrors the real “identity + authorization” split in a production system.
+POLICY_TABLE = {
+    "alice": {
+        "team-alpha": {"read_note": True, "write_note": False, "delete_note": False, "deploy_release": False},
+        "team-beta": {"read_note": False, "write_note": False, "delete_note": False, "deploy_release": False},
+    },
+    "bob": {
+        "team-alpha": {"read_note": True, "write_note": True, "delete_note": False, "deploy_release": False},
+        "team-beta": {"read_note": True, "write_note": True, "delete_note": False, "deploy_release": False},
+    },
+    "charlie": {
+        "team-alpha": {"read_note": False, "write_note": False, "delete_note": False, "deploy_release": False},
+        "team-beta": {"read_note": False, "write_note": False, "delete_note": False, "deploy_release": False},
+    },
+    "admin": {
+        "team-alpha": {"read_note": True, "write_note": True, "delete_note": True, "deploy_release": True},
+        "team-beta": {"read_note": True, "write_note": True, "delete_note": True, "deploy_release": True},
+    },
+}
+
+TOOL_ORDER = [
+    ("read_note", "team-alpha"),
+    ("write_note", "team-alpha"),
+    ("delete_note", "team-alpha"),
+    ("deploy_release", "team-alpha"),
+    ("read_note", "team-beta"),
+    ("write_note", "team-beta"),
+]
+
 
 def b64url_decode(s: str) -> bytes:
     padding_needed = 4 - (len(s) % 4)
     if padding_needed != 4:
         s += "=" * padding_needed
     return base64.urlsafe_b64decode(s)
+
+
+def user_can_call_tool(username: str, tool: str, resource: str) -> bool:
+    return bool(POLICY_TABLE.get(username, {}).get(resource, {}).get(tool, False))
+
+
+def build_policy_checks(username: str) -> list[dict]:
+    rows = []
+    for tool, resource in TOOL_ORDER:
+        allowed = user_can_call_tool(username, tool, resource)
+        if allowed:
+            reason = f"Policy allows this subject to call {tool} on {resource}."
+        else:
+            reason = f"Identity is valid, but policy denies {tool} on {resource}."
+        rows.append({
+            "tool": tool,
+            "resource": resource,
+            "allowed": allowed,
+            "reason": reason,
+        })
+    return rows
 
 
 @app.route("/")
@@ -153,12 +205,59 @@ def callback():
     )
     trace = trace_add(trace, "app", "🟢", f"Session established for {payload.get('name')}. Login complete.")
 
+    session["claims"] = payload
+    session["authenticated"] = True
+    session["trace"] = trace
+    policy_checks = build_policy_checks(payload.get("sub"))
+    trace = trace_add(
+        trace, "app", "🛡️",
+        f"Evaluating authorization policy for {payload.get('sub')} before any tool call is permitted.",
+    )
     return render_template(
         "welcome.html",
         claims=payload,
         header=header,
         raw_token=id_token,
         trace=trace,
+        policy_checks=policy_checks,
+    )
+
+
+@app.route("/tool/<tool>")
+def invoke_tool(tool: str):
+    if not session.get("authenticated"):
+        return redirect("/")
+
+    resource = request.args.get("resource", "team-alpha")
+    username = session["claims"].get("sub")
+    allowed = user_can_call_tool(username, tool, resource)
+    trace = session.get("trace", [])
+
+    if allowed:
+        trace = trace_add(
+            trace, "app", "✅",
+            f"Authorization check passed: {username} may call {tool} on {resource}.",
+        )
+        message = f"Tool call allowed. {tool} executed on {resource}."
+        status = "allowed"
+    else:
+        trace = trace_add(
+            trace, "app", "⛔",
+            f"Authorization check denied: {username} is not allowed to call {tool} on {resource}.",
+        )
+        message = f"Tool call denied. {tool} is not permitted on {resource}."
+        status = "denied"
+
+    session["trace"] = trace
+    return render_template(
+        "tool_result.html",
+        tool=tool,
+        resource=resource,
+        allowed=allowed,
+        status=status,
+        message=message,
+        trace=trace,
+        username=username,
     )
 
 

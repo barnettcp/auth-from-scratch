@@ -52,11 +52,30 @@ watch for:
    signed identity token, by calling Aegis ID directly.
 5. Lighthouse Notes fetches Aegis ID's *public* key and verifies the token's
    signature itself, without needing to ask Aegis ID "is this real?"
-6. Only after that verification succeeds are you shown as logged in.
+6. Only after that verification succeeds does the app consider you logged in.
+7. The app then checks whether your identity is allowed to call specific tools
+   on specific resources. This is the identity-vs-authorization boundary.
 
 Try breaking it, too: stop the IdP server mid-flow, or start a login and let
 more than 60 seconds pass before submitting the form (authorization codes
 expire) — you should see a clear rejection, not a silent failure.
+
+## Authorization after login
+
+Once the user is verified, the app asks a second question: "can this subject
+invoke this tool on this resource?"
+
+This demo intentionally keeps it simple. The identity token proves who the user
+is; the app's policy table then decides whether that identity may call a tool.
+Examples in the demo include:
+
+- `alice` can read notes but cannot delete them
+- `bob` can read and write notes
+- `admin` is allowed to do more than ordinary users
+
+This is the same basic pattern used by real tool gateways, internal APIs, and
+agent access layers: identify the caller, check policy, and allow or reject the
+action at the boundary.
 
 ## Files
 

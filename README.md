@@ -40,10 +40,11 @@ auth-from-scratch/
 │                            Provider ("Aegis ID") and a toy Relying Party
 │                            ("Lighthouse Notes") -- doing a real, simplified
 │                            OIDC-style login over actual HTTP, with a live
-│                            on-page trace of every step
-└── part3-tool-access/        Illustrative, non-production examples of
-                             user identity plus tool authorization and policy
-                             enforcement after login
+│                            on-page trace of every step, and a follow-on
+│                            authorization check before tool use
+├── part3-tool-access/        Optional concept extension for the policy and
+│                            access-control ideas shown in the app, not the
+│                            main line of the tutorial
 ```
 
 ### Part 1 — Foundations (start here)
@@ -74,18 +75,19 @@ The same flow as Notebook 7, rebuilt as two actual HTTP servers so you can
 watch it happen in a browser, with a live process trace narrating each step
 as it occurs.
 
+This is the main practical continuation of the repo's story: first the user is
+verified as a real subject, and then the app checks whether that subject may
+invoke a given tool or action. The second half of the demo is intentionally
+about policy enforcement after a successful login.
+
 See [`part2-web-app/README.md`](part2-web-app/README.md) for instructions.
 
-### Part 3 — Tool access and authorization
+### Optional concept extension: tool access and authorization
 
-Once identity is established, the next question is whether a user is allowed to
-invoke a given tool or action. This part introduces the conceptual split between
-authentication and authorization, using toy examples that are intentionally
-simple but map closely onto real tool gateways, internal APIs, and agentic
-access control.
-
-See [`part3-tool-access/README.md`](part3-tool-access/README.md) for the
-introductory concept and the recommended framing for this section.
+If you want to go a bit deeper after the toy app, the conceptual extension in
+[`part3-tool-access/README.md`](part3-tool-access/README.md) expands on the
+identity-vs-authorization split and why it matters for policy-bound tool use
+in the real world.
 
 ## How this maps onto Okta / Auth0 / real SSO
 

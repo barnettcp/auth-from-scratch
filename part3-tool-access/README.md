@@ -1,6 +1,6 @@
-# Part 3 — Tool Access and Authorization
+# Optional Extension — Tool Access and Authorization
 
-This part of the repository shifts from "who is this person?" to "what is this person allowed to do?"
+This is not the main line of the repository. It is an optional follow-on concept that sits directly after the main login flow and asks: "Now that we know who this person is, what are they allowed to do?"
 
 Authentication and authorization are related, but they are not the same thing:
 

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Tool Result — Lighthouse Notes{% endblock %}
+{% block tag %}Relying Party{% endblock %}
+
+{% block content %}
+{% set brand_kind = 'app' %}
+<div class="split">
+  <div class="panel">
+    <span class="badge {{ 'allowed' if allowed else 'denied' }}">
+      {{ 'Tool allowed' if allowed else 'Tool denied' }}
+    </span>
+    <h2>{{ username }} tried {{ tool }} on {{ resource }}</h2>
+    <p class="lede">{{ message }}</p>
+
+    <div class="section-label">What happened</div>
+    <p class="lede">
+      The app had already verified the user's signed identity token. The last
+      step was a policy check: the system asked, "Is this user allowed to call
+      this tool on this resource?" This is the authorization boundary.
+    </p>
+
+    <p class="hint"><a href="/">← Back to the app</a></p>
+  </div>
+
+  <div class="trace-panel">
+    <h3>Policy decision trace</h3>
+    <div id="trace-container" data-trace='{{ trace|tojson }}'></div>
+  </div>
+</div>
+{% endblock %}
