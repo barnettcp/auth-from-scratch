@@ -77,6 +77,43 @@ This is the same basic pattern used by real tool gateways, internal APIs, and
 agent access layers: identify the caller, check policy, and allow or reject the
 action at the boundary.
 
+## Why this matters conceptually
+
+Authentication and authorization are related, but they are not the same thing:
+
+- Authentication answers: "Who is this caller?"
+- Authorization answers: "Is this caller allowed to invoke this action on this
+  resource?"
+
+The examples in the earlier parts of this repository focus on proving identity
+using keys, signatures, and JWTs. This part of the story is about the boundary
+where identity becomes action.
+
+A production system usually follows this flow:
+
+1. A user authenticates and receives a signed identity token.
+2. The application or tool gateway reads the token and identifies the subject.
+3. The system checks policy: user, role, group, tenant, resource, tool name,
+   and action.
+4. If allowed, the action is executed.
+5. If denied, the call fails with a clear authorization failure.
+
+This is not a special "MCP feature"; it is a general engineering pattern. Any
+system that exposes tools to authenticated users should check whether that
+identity is permitted to invoke that specific tool on that specific resource.
+
+The mental model is:
+
+```text
+User identity + policy decision + resource + action
+      |                |             |        |
+      v                v             v        v
+"who are you?"   "are you allowed?"  "what are you touching?"
+```
+
+In other words: the token proves identity, but policy enforcement decides
+whether the user can actually do anything useful with it.
+
 ## Files
 
 ```

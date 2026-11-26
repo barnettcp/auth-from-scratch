@@ -40,11 +40,9 @@ auth-from-scratch/
 │                            Provider ("Aegis ID") and a toy Relying Party
 │                            ("Lighthouse Notes") -- doing a real, simplified
 │                            OIDC-style login over actual HTTP, with a live
-│                            on-page trace of every step, and a follow-on
-│                            authorization check before tool use
-├── part3-tool-access/        Optional concept extension for the policy and
-│                            access-control ideas shown in the app, not the
-│                            main line of the tutorial
+│                            on-page trace of every step, and the authorization
+│                            check that decides whether a logged-in user may
+│                            invoke a tool on a resource
 ```
 
 ### Part 1 — Foundations (start here)
@@ -82,12 +80,16 @@ about policy enforcement after a successful login.
 
 See [`part2-web-app/README.md`](part2-web-app/README.md) for instructions.
 
-### Optional concept extension: tool access and authorization
+### Tool access and authorization
 
-If you want to go a bit deeper after the toy app, the conceptual extension in
-[`part3-tool-access/README.md`](part3-tool-access/README.md) expands on the
-identity-vs-authorization split and why it matters for policy-bound tool use
-in the real world.
+The main repo flow now keeps the identity-vs-authorization distinction inside
+Part 2 itself. The app shows the complete story: a user authenticates, the app
+verifies the token, and then checks whether that identity may invoke a specific
+tool on a specific resource.
+
+This is the same basic production pattern as API and tool gateways: identity is
+proof of who the caller is; policy is the decision about what that caller may
+do.
 
 ## How this maps onto Okta / Auth0 / real SSO
 
