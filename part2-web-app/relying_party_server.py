@@ -49,6 +49,13 @@ TRUSTED_ISSUER = IDP_BASE_URL
 # A toy policy table: same user can authenticate as themselves, but only some
 # users are allowed to call certain tools on certain resources.
 # This mirrors the real “identity + authorization” split in a production system.
+USER_ROLES = {
+    "alice": ["reader"],
+    "bob": ["editor"],
+    "charlie": [],
+    "admin": ["admin"],
+}
+
 POLICY_TABLE = {
     "alice": {
         "team-alpha": {"read_note": True, "write_note": False, "delete_note": False, "deploy_release": False},
@@ -67,6 +74,8 @@ POLICY_TABLE = {
         "team-beta": {"read_note": True, "write_note": True, "delete_note": True, "deploy_release": True},
     },
 }
+
+RESOURCE_CHOICES = ["team-alpha", "team-beta"]
 
 TOOL_ORDER = [
     ("read_note", "team-alpha"),
@@ -89,21 +98,31 @@ def user_can_call_tool(username: str, tool: str, resource: str) -> bool:
     return bool(POLICY_TABLE.get(username, {}).get(resource, {}).get(tool, False))
 
 
-def build_policy_checks(username: str) -> list[dict]:
+def build_policy_checks(username: str, selected_resource: str | None = None) -> list[dict]:
     rows = []
-    for tool, resource in TOOL_ORDER:
-        allowed = user_can_call_tool(username, tool, resource)
-        if allowed:
-            reason = f"Policy allows this subject to call {tool} on {resource}."
-        else:
-            reason = f"Identity is valid, but policy denies {tool} on {resource}."
-        rows.append({
-            "tool": tool,
-            "resource": resource,
-            "allowed": allowed,
-            "reason": reason,
-        })
+    resources = [selected_resource] if selected_resource else RESOURCE_CHOICES
+    for resource in resources:
+        for tool in ["read_note", "write_note", "delete_note", "deploy_release"]:
+            allowed = user_can_call_tool(username, tool, resource)
+            if allowed:
+                reason = f"Policy allows this subject to call {tool} on {resource}."
+            else:
+                reason = f"Identity is valid, but policy denies {tool} on {resource}."
+            rows.append({
+                "tool": tool,
+                "resource": resource,
+                "allowed": allowed,
+                "reason": reason,
+            })
     return rows
+
+
+def get_selected_resource() -> str:
+    resource = request.args.get("resource", session.get("selected_resource", RESOURCE_CHOICES[0]))
+    if resource not in RESOURCE_CHOICES:
+        resource = RESOURCE_CHOICES[0]
+    session["selected_resource"] = resource
+    return resource
 
 
 @app.route("/")
@@ -206,20 +225,36 @@ def callback():
     trace = trace_add(trace, "app", "🟢", f"Session established for {payload.get('name')}. Login complete.")
 
     session["claims"] = payload
+    session["raw_token"] = id_token
     session["authenticated"] = True
     session["trace"] = trace
-    policy_checks = build_policy_checks(payload.get("sub"))
     trace = trace_add(
         trace, "app", "🛡️",
         f"Evaluating authorization policy for {payload.get('sub')} before any tool call is permitted.",
     )
+    session["trace"] = trace
+    session["selected_resource"] = RESOURCE_CHOICES[0]
+    return redirect(f"/welcome?resource={RESOURCE_CHOICES[0]}")
+
+
+@app.route("/welcome")
+def welcome():
+    if not session.get("authenticated"):
+        return redirect("/")
+
+    username = session["claims"].get("sub")
+    selected_resource = get_selected_resource()
+    trace = session.get("trace", [])
+    policy_checks = build_policy_checks(username, selected_resource=selected_resource)
     return render_template(
         "welcome.html",
-        claims=payload,
-        header=header,
-        raw_token=id_token,
+        claims=session["claims"],
+        raw_token=session.get("raw_token"),
         trace=trace,
         policy_checks=policy_checks,
+        user_roles=USER_ROLES.get(username, []),
+        resource_choices=RESOURCE_CHOICES,
+        selected_resource=selected_resource,
     )
 
 

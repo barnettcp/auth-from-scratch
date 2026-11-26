@@ -41,6 +41,28 @@
       step-by-step walkthrough of exactly this structure.
     </div>
 
+    <div class="section-label">Identity summary</div>
+    <table class="claims-table compact-table">
+      <tr>
+        <th>User</th>
+        <th>Role(s)</th>
+        <th>Access model</th>
+      </tr>
+      <tr>
+        <td>{{ claims.sub }}</td>
+        <td>
+          {% if user_roles %}
+            {% for role in user_roles %}
+              <span class="role-pill">{{ role }}</span>
+            {% endfor %}
+          {% else %}
+            <span class="muted">No assigned roles</span>
+          {% endif %}
+        </td>
+        <td>Login proved identity; policy decides tool access.</td>
+      </tr>
+    </table>
+
     <div class="section-label">Authorization after login</div>
     <p class="lede">
       The identity check succeeded. The app now checks whether this specific
@@ -48,6 +70,18 @@
       important distinction between <strong>authentication</strong> and
       <strong>authorization</strong>.
     </p>
+
+    <form class="resource-form" method="get" action="{{ url_for('welcome') }}">
+      <label for="resource">Select resource</label>
+      <div class="resource-picker">
+        <select id="resource" name="resource">
+          {% for choice in resource_choices %}
+            <option value="{{ choice }}" {% if choice == selected_resource %}selected{% endif %}>{{ choice }}</option>
+          {% endfor %}
+        </select>
+        <button class="button app tiny" type="submit">Refresh policy</button>
+      </div>
+    </form>
 
     <table class="claims-table tool-table">
       <tr>
